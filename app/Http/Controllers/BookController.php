@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use Illuminate\Console\View\Components\Task;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
@@ -65,11 +64,14 @@ class BookController extends Controller
         $book = cache()->remember(
             $cacheKey,
             3600,
-            function () use ($book) {
-                return $book->load(['reviews' => function ($query) {
-                    $query->latest();
-                }]);
-            });
+            fn() =>
+            Book::with(
+                ['reviews' =>
+                    fn($query)=> $query->latest()
+                ]
+            )->withAvgRating()->withReviewCount()->findOrFail($book->id)
+
+            );
 
         return view('books.show', ['book' => $book]);
     }

@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Book;
+use App\Models\User;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
@@ -28,11 +28,16 @@ class ExampleTest extends TestCase
 
     public function test_book_page_have_book_title()
     {
+        $user = User::factory()->create([
+            'is_admin' => true,
+        ]);
         // First, get a book from the database
         $book = Book::with('reviews')
             ->withReviewsCount()
             ->first();
 
-        $response = $this->get('/books');
+        $response = $this->actingAs($user)->get('/books/'.$book->id);
+        $response->assertSee($book->title);
+        $response->assertStatus(200);
     }
 }

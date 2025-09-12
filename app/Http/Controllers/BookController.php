@@ -70,9 +70,7 @@ class BookController extends Controller
                         fn($query) => $query->latest()
                 ]
             )->withAvgRating()->withReviewsCount()->findOrFail($book->id)
-
         );
-
         return view('books.show', ['book' => $book]);
     }
 

@@ -39,7 +39,7 @@ class ReviewController extends Controller
             'review' => 'required|string|max:300',
         ]);
         $book->reviews()->create($data);
-        return redirect()->route('books.show', $book);
+        return redirect()->route('books.show', $book)->with('success', 'Review added successfully');
     }
 
     /**

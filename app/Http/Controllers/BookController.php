@@ -29,7 +29,7 @@ class BookController extends Controller
             default => $books->latest()->withAvgRating()->withReviewsCount()
         };
 
-        $cacheKey = 'books:'.$filter.':'.$title;
+        $cacheKey = 'books:' . $filter . ':' . $title;
         $books = cache()->remember(
             $cacheKey,
             3600,
@@ -44,7 +44,7 @@ class BookController extends Controller
      */
     public function create()
     {
-        //
+        return view('books.create');
     }
 
     /**
@@ -52,7 +52,15 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+        ]);
+
+        Book::create($validated);
+
+        return redirect()->route('books.index')
+            ->with('success', 'Book created successfully.');
     }
 
     /**
@@ -60,7 +68,7 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        $cacheKey = 'book:'.$book->id;
+        $cacheKey = 'book:' . $book->id;
         $book = cache()->remember(
             $cacheKey,
             3600,
@@ -77,24 +85,35 @@ class BookController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Book $book)
     {
-        //
+        return view('books.edit', ['book' => $book]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Book $book)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+        ]);
+
+        $book->update($validated);
+
+        return redirect()->route('books.index')
+            ->with('success', 'Book updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Book $book)
     {
-        //
+        $book->delete();
+
+        return redirect()->route('books.index')
+            ->with('success', 'Book deleted successfully.');
     }
 }
